@@ -1,220 +1,197 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport"
+    content="width=device-width, initial-scale=1.0">
 
     <title>MinePulse</title>
 
-    <link
-        rel="stylesheet"
-        href="style.css"
-    >
+    <meta name="description"
+    content="MinePulse is a futuristic Minecraft server intelligence platform with real-time server analytics, status checking, favorites, and monitoring.">
 
+    <meta name="keywords"
+    content="minecraft server checker, minecraft status, minecraft analytics, minepulse, minecraft server finder">
+
+    <meta name="author"
+    content="KasishStar">
+
+    <meta property="og:title"
+    content="MinePulse">
+
+    <meta property="og:description"
+    content="Futuristic Minecraft Server Intelligence Platform">
+
+    <meta property="og:type"
+    content="website">
+
+    <meta property="og:url"
+    content="https://kasishstar.github.io/minepulse">
+
+    <meta property="og:image"
+    content="https://kasishstar.github.io/minepulse/banner.png">
+
+    <link rel="stylesheet"
+    href="style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-KS8QE5Y1PS"></script>
+
+    <script>
+      window.dataLayer = window.dataLayer || [];
+
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+
+      gtag('js', new Date());
+
+      gtag('config', 'G-KS8QE5Y1PS');
+    </script>
 </head>
 
 <body>
 
     <div id="particles-js"></div>
 
-    <div class="background-grid"></div>
+    <div class="container">
 
-    <div class="cursor-glow"></div>
+        <h1>MinePulse</h1>
 
-    <div class="orb orb1"></div>
-
-    <div class="orb orb2"></div>
-
-    <div class="container fade-in">
-
-        <div class="hero">
-
-            <h1>MinePulse</h1>
-
-            <p class="tagline">
-                Real-Time Minecraft Server Intelligence
-            </p>
-
-        </div>
+        <p class="subtitle">
+            Minecraft Server Intelligence Platform
+        </p>
 
         <div class="search-box">
 
             <input
-                type="text"
-                id="serverIP"
-                placeholder="Enter Minecraft Server IP"
-            >
+            type="text"
+            id="serverIP"
+            placeholder="Enter Minecraft Server IP">
 
             <button onclick="checkServerStatus()">
-                Analyze Server
+                Scan
+            </button>
+        </div>
+
+        <div class="actions">
+
+            <button id="copyBtn">
+                Copy IP
             </button>
 
+            <button id="favoriteBtn">
+                Favorite
+            </button>
         </div>
 
-        <div class="analytics-grid">
+        <div class="server-card">
 
-            <div class="analytics-card">
+            <img
+            id="serverIcon"
+            src="https://static-00.iconduck.com/assets.00/minecraft-icon-2048x2048-3i6m39mg.png">
 
-                <h3>Total Checks</h3>
+            <h2 id="status">
+                Waiting...
+            </h2>
 
-                <p id="totalChecks">0</p>
+            <div class="info-grid">
 
+                <div class="info-box">
+                    <span>Players</span>
+                    <h3 id="players">-</h3>
+                </div>
+
+                <div class="info-box">
+                    <span>Version</span>
+                    <h3 id="version">-</h3>
+                </div>
+
+                <div class="info-box">
+                    <span>Ping</span>
+                    <h3 id="ping">-</h3>
+                </div>
+
+                <div class="info-box">
+                    <span>Software</span>
+                    <h3 id="software">-</h3>
+                </div>
             </div>
 
-            <div class="analytics-card">
-
-                <h3>Favorite Servers</h3>
-
-                <p id="favoriteCount">0</p>
-
+            <div class="motd-box">
+                <span>MOTD</span>
+                <p id="motd">-</p>
             </div>
-
-            <div class="analytics-card">
-
-                <h3>Server Status</h3>
-
-                <p id="pingStatus">-</p>
-
-            </div>
-
-            <div class="analytics-card">
-
-                <h3>Server Software</h3>
-
-                <p id="softwareType">-</p>
-
-            </div>
-
         </div>
 
-        <div class="monitor-section">
+        <div class="panel">
 
-            <div class="card">
+            <h2>Favorites</h2>
 
-                <h2>
-                    Multi Server Monitor
-                </h2>
-
-                <div
-                    id="monitorGrid"
-                    class="monitor-grid"
-                >
-
-                </div>
-
-            </div>
-
+            <div id="favoritesList"></div>
         </div>
 
-        <div class="dashboard">
+        <div class="panel">
 
-            <div class="card main-card">
+            <h2>Recent Searches</h2>
 
-                <div class="top-section">
+            <div id="recentList"></div>
+        </div>
 
-                    <img
-                        id="serverIcon"
-                        src="https://api.iconify.design/mdi/minecraft.svg?color=%2360a5fa"
-                    >
+        <div class="panel">
 
-                    <div>
+            <h2>Trending Servers</h2>
 
-                        <h2 id="status">
-                            Waiting...
-                        </h2>
-
-                        <button id="copyBtn">
-                            Copy IP
-                        </button>
-
-                    </div>
-
-                </div>
-
-                <div class="info-grid">
-
-                    <p>
-                        Players:
-                        <span id="players">-</span>
-                    </p>
-
-                    <p>
-                        Version:
-                        <span id="version">-</span>
-                    </p>
-
-                    <p>
-                        Ping:
-                        <span id="ping">-</span>
-                    </p>
-
-                    <p>
-                        MOTD:
-                        <span id="motd">-</span>
-                    </p>
-
-                    <p>
-                        Bedrock:
-                        <span id="bedrock">-</span>
-                    </p>
-
-                    <p>
-                        Uptime Memory:
-                        <span id="uptimeMemory">
-                            0 checks
-                        </span>
-                    </p>
-
-                </div>
-
-                <button id="favoriteBtn">
-                    ⭐ Save Favorite
-                </button>
-
-            </div>
-
-            <div class="side-panel">
-
-                <div class="card small-card">
-
-                    <h3>⭐ Favorites</h3>
-
-                    <div id="favoritesList"></div>
-
-                </div>
-
-                <div class="card small-card">
-
-                    <h3>🕒 Search History</h3>
-
-                    <div id="historyList"></div>
-
-                </div>
-
-                <div class="card small-card">
-
-                    <h3>🔥 Trending Servers</h3>
-
-                    <div id="trendingList"></div>
-
-                </div>
-
-            </div>
-
+            <div id="trendingList"></div>
         </div>
 
     </div>
 
-    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-
     <script src="script.js"></script>
 
-</body>
+    <script>
 
+        particlesJS("particles-js", {
+
+            particles: {
+
+                number: {
+                    value: 60
+                },
+
+                color: {
+                    value: "#00aaff"
+                },
+
+                shape: {
+                    type: "circle"
+                },
+
+                opacity: {
+                    value: 0.4
+                },
+
+                size: {
+                    value: 3
+                },
+
+                move: {
+                    enable: true,
+                    speed: 1
+                },
+
+                line_linked: {
+                    enable: true,
+                    color: "#00aaff",
+                    opacity: 0.2
+                }
+            }
+        });
+
+    </script>
+
+</body>
 </html>

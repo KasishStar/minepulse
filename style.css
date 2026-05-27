@@ -1,0 +1,411 @@
+*{
+
+    margin:0;
+
+    padding:0;
+
+    box-sizing:border-box;
+
+    font-family:sans-serif;
+}
+
+body{
+
+    background:#020617;
+
+    color:white;
+
+    overflow-x:hidden;
+}
+
+#particles-js{
+
+    position:fixed;
+
+    width:100%;
+
+    height:100%;
+
+    z-index:-5;
+}
+
+.container{
+
+    width:95%;
+
+    max-width:1400px;
+
+    margin:auto;
+
+    padding:30px 0;
+}
+
+.hero{
+
+    text-align:center;
+
+    margin-bottom:30px;
+}
+
+.hero h1{
+
+    font-size:4rem;
+
+    color:#60a5fa;
+
+    text-shadow:
+    0 0 20px #3b82f6;
+}
+
+.tagline{
+
+    margin-top:10px;
+
+    opacity:0.8;
+}
+
+.search-box{
+
+    display:flex;
+
+    gap:15px;
+
+    margin-bottom:30px;
+}
+
+.search-box input{
+
+    flex:1;
+
+    padding:16px;
+
+    border:none;
+
+    border-radius:14px;
+
+    background:#0f172a;
+
+    color:white;
+
+    outline:none;
+
+    font-size:1rem;
+}
+
+.search-box button{
+
+    padding:16px 28px;
+
+    border:none;
+
+    border-radius:14px;
+
+    background:#2563eb;
+
+    color:white;
+
+    cursor:pointer;
+
+    transition:0.3s;
+}
+
+.search-box button:hover{
+
+    transform:translateY(-3px);
+
+    box-shadow:
+    0 0 20px #2563eb;
+}
+
+.analytics-grid{
+
+    display:grid;
+
+    grid-template-columns:
+    repeat(auto-fit,minmax(220px,1fr));
+
+    gap:20px;
+
+    margin-bottom:30px;
+}
+
+.analytics-card{
+
+    background:
+    rgba(15,23,42,0.8);
+
+    border:
+    1px solid rgba(96,165,250,0.2);
+
+    padding:20px;
+
+    border-radius:20px;
+
+    backdrop-filter:blur(10px);
+}
+
+.dashboard{
+
+    display:grid;
+
+    grid-template-columns:
+    2fr 1fr;
+
+    gap:20px;
+}
+
+.card{
+
+    background:
+    rgba(15,23,42,0.8);
+
+    border:
+    1px solid rgba(96,165,250,0.15);
+
+    border-radius:24px;
+
+    padding:25px;
+
+    backdrop-filter:blur(12px);
+}
+
+.top-section{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:20px;
+
+    margin-bottom:25px;
+}
+
+#serverIcon{
+
+    width:90px;
+
+    height:90px;
+
+    border-radius:20px;
+}
+
+#copyBtn,
+#favoriteBtn{
+
+    margin-top:10px;
+
+    padding:12px 18px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:#2563eb;
+
+    color:white;
+
+    cursor:pointer;
+
+    transition:0.3s;
+}
+
+#copyBtn:hover,
+#favoriteBtn:hover{
+
+    box-shadow:
+    0 0 20px #2563eb;
+}
+
+.info-grid{
+
+    display:grid;
+
+    grid-template-columns:
+    repeat(auto-fit,minmax(200px,1fr));
+
+    gap:18px;
+}
+
+.small-card{
+
+    margin-bottom:20px;
+}
+
+.list-item{
+
+    padding:12px;
+
+    background:
+    rgba(30,41,59,0.8);
+
+    border-radius:12px;
+
+    margin-top:10px;
+
+    cursor:pointer;
+
+    transition:0.3s;
+}
+
+.list-item:hover{
+
+    transform:translateX(5px);
+
+    background:
+    rgba(37,99,235,0.5);
+}
+
+.monitor-section{
+
+    margin-bottom:30px;
+}
+
+.monitor-grid{
+
+    display:grid;
+
+    grid-template-columns:
+    repeat(auto-fit,minmax(220px,1fr));
+
+    gap:20px;
+
+    margin-top:20px;
+}
+
+.monitor-card{
+
+    position:relative;
+
+    padding:20px;
+
+    border-radius:20px;
+
+    transition:0.3s;
+}
+
+.online-card{
+
+    background:
+    rgba(22,101,52,0.3);
+
+    border:
+    1px solid #22c55e;
+
+    box-shadow:
+    0 0 20px rgba(34,197,94,0.3);
+}
+
+.offline-card{
+
+    background:
+    rgba(127,29,29,0.3);
+
+    border:
+    1px solid #ef4444;
+
+    box-shadow:
+    0 0 20px rgba(239,68,68,0.3);
+}
+
+.monitor-card:hover{
+
+    transform:translateY(-5px);
+}
+
+.remove-btn{
+
+    position:absolute;
+
+    top:10px;
+
+    right:10px;
+
+    border:none;
+
+    background:#ef4444;
+
+    color:white;
+
+    width:28px;
+
+    height:28px;
+
+    border-radius:50%;
+
+    cursor:pointer;
+}
+
+.cursor-glow{
+
+    position:fixed;
+
+    width:250px;
+
+    height:250px;
+
+    background:
+    radial-gradient(
+    circle,
+    rgba(59,130,246,0.15),
+    transparent 70%
+    );
+
+    pointer-events:none;
+
+    transform:
+    translate(-50%,-50%);
+
+    z-index:-1;
+}
+
+.fade-in{
+
+    animation:fadeIn 1s ease;
+}
+
+@keyframes fadeIn{
+
+    from{
+
+        opacity:0;
+
+        transform:translateY(20px);
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:translateY(0);
+    }
+}
+
+@media(max-width:900px){
+
+    .dashboard{
+
+        grid-template-columns:1fr;
+    }
+
+    .search-box{
+
+        flex-direction:column;
+    }
+
+    .hero h1{
+
+        font-size:2.8rem;
+    }
+
+    .top-section{
+
+        flex-direction:column;
+
+        text-align:center;
+    }
+
+    .info-grid{
+
+        grid-template-columns:1fr;
+    }
+}

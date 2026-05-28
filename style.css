@@ -137,3 +137,37 @@ ul {
   background: rgba(20,20,20,0.6);
   backdrop-filter: blur(10px);
 }
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: rgba(20,20,20,0.9);
+  color: white;
+  padding: 10px 16px;
+  border-radius: 10px;
+  opacity: 0;
+  transition: 0.3s ease;
+  font-size: 14px;
+  z-index: 9999;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+#card.show {
+  animation: pop 0.25s ease-out;
+}
+
+@keyframes pop {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

@@ -3,59 +3,54 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>MinePulse</title>
+  <title>MinePulse V10</title>
   <link rel="stylesheet" href="style.css"/>
 </head>
+
 <body>
 
-<div class="bg"></div>
+<div class="container">
 
-<div class="app">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
 
-  <h1>🟩 MinePulse v2</h1>
-  <p class="sub">Advanced Minecraft Server Explorer</p>
+    <h3>Favorites</h3>
+    <ul id="favList"></ul>
 
-  <!-- SEARCH -->
-  <div class="searchBox">
-    <input id="serverIP" placeholder="Search server (e.g. hypixel.net)" />
-    <button id="searchBtn">Search</button>
-    <button id="favBtn">★</button>
+    <h3>History</h3>
+    <ul id="histList"></ul>
+
+    <h3>Trending</h3>
+    <ul id="trendList"></ul>
+
   </div>
 
-  <!-- STATUS -->
-  <div id="status" class="status"></div>
+  <!-- MAIN -->
+  <div class="main">
 
-  <!-- AUTOCOMPLETE -->
-  <div id="suggestions" class="suggestions"></div>
+    <h1 style="color:#2b6fff;">🟦 MinePulse V10</h1>
+    <p style="color:#7f93b3;">Minecraft Server Explorer Terminal UI</p>
 
-  <!-- SERVER CARD -->
-   <button id="copyBtn" class="copy-btn">Copy IP</button>
-  <div id="card" class="card hidden">
-    <img id="icon" />
-    <div>
+    <!-- SEARCH BAR -->
+    <div class="search-box">
+      <input id="serverIP" placeholder="Enter server (e.g. hypixel.net)" />
+      <button id="searchBtn">Search</button>
+      <button id="favBtn">★</button>
+      <button id="copyBtn">Copy IP</button>
+    </div>
+
+    <div id="status"></div>
+
+    <!-- CARD -->
+    <div id="card" class="hidden">
+
+      <img id="icon" />
       <h2 id="name"></h2>
+
       <p id="motd"></p>
       <p id="players"></p>
       <p id="ping"></p>
-    </div>
-  </div>
 
-  <!-- PANELS -->
-  <div class="grid">
-
-    <div class="box">
-      <h3>⭐ Favorites</h3>
-      <ul id="favList"></ul>
-    </div>
-
-    <div class="box">
-      <h3>🕘 History</h3>
-      <ul id="histList"></ul>
-    </div>
-
-    <div class="box">
-      <h3>🔥 Trending</h3>
-      <ul id="trendList"></ul>
     </div>
 
   </div>

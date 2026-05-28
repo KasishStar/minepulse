@@ -1,5 +1,6 @@
 const API_BASE = "https://minepulse-h6zl.onrender.com";
 
+/* ELEMENTS */
 const input = document.getElementById("serverIP");
 const searchBtn = document.getElementById("searchBtn");
 const favBtn = document.getElementById("favBtn");
@@ -17,66 +18,85 @@ const favList = document.getElementById("favList");
 const histList = document.getElementById("histList");
 const trendList = document.getElementById("trendList");
 
+/* STATE */
 let fav = JSON.parse(localStorage.getItem("fav")) || [];
 let hist = JSON.parse(localStorage.getItem("hist")) || [];
 
-const trending = [
-  "hypixel.net",
-  "mineplex.com",
-  "herobrine.org",
-  "2b2t.org",
-  "pika-network.net"
-];
-
+/* SAVE */
 function save() {
   localStorage.setItem("fav", JSON.stringify(fav));
   localStorage.setItem("hist", JSON.stringify(hist));
 }
 
+/* RENDER LIST */
 function render() {
   favList.innerHTML = "";
   histList.innerHTML = "";
   trendList.innerHTML = "";
 
-  fav.forEach(x => {
-    const li = document.createElement("li");
-    li.textContent = x;
-    li.onclick = () => input.value = x;
-    favList.appendChild(li);
-  });
+  fav.forEach(x => addItem(favList, x));
+  hist.forEach(x => addItem(histList, x));
 
-  hist.forEach(x => {
-    const li = document.createElement("li");
-    li.textContent = x;
-    li.onclick = () => input.value = x;
-    histList.appendChild(li);
-  });
-
-  trending.forEach(x => {
-    const li = document.createElement("li");
-    li.textContent = x;
-    li.onclick = () => input.value = x;
-    trendList.appendChild(li);
-  });
+  loadTrending();
 }
 
+function addItem(parent, value) {
+  const li = document.createElement("li");
+  li.textContent = value;
+
+  li.onclick = () => {
+    input.value = value;
+    fetchServer(value);
+  };
+
+  parent.appendChild(li);
+}
+
+/* TRENDING LOAD */
+async function loadTrending() {
+  try {
+    const res = await fetch(`${API_BASE}/api/trending`);
+    const data = await res.json();
+
+    trendList.innerHTML = "";
+
+    data.forEach(item => {
+      const li = document.createElement("li");
+      li.textContent = `${item.ip} (${item.score})`;
+
+      li.onclick = () => {
+        input.value = item.ip;
+        fetchServer(item.ip);
+      };
+
+      trendList.appendChild(li);
+    });
+  } catch (e) {}
+}
+
+/* FAVORITE */
 favBtn.onclick = () => {
   if (!input.value) return;
-  if (!fav.includes(input.value)) fav.push(input.value);
-  save();
-  render();
+
+  if (!fav.includes(input.value)) {
+    fav.push(input.value);
+    save();
+    render();
+  }
 };
 
+/* SEARCH */
 searchBtn.onclick = () => fetchServer(input.value);
 
-input.addEventListener("keydown", (e) => {
+input.addEventListener("keydown", e => {
   if (e.key === "Enter") fetchServer(input.value);
 });
 
+/* CORE FETCH */
 async function fetchServer(ip) {
   if (!ip) return;
 
-  statusBox.textContent = "Searching...";
+  statusBox.textContent = "Scanning network...";
   card.classList.add("hidden");
 
   hist.unshift(ip);
@@ -89,23 +109,24 @@ async function fetchServer(ip) {
     const data = await res.json();
 
     if (!data.online) {
-      statusBox.textContent = "Offline";
+      statusBox.textContent = "Offline / Unknown";
       return;
     }
 
     card.classList.remove("hidden");
 
-    icon.src = data.icon;
+    icon.src = data.icon || "";
     nameEl.textContent = ip;
     motd.textContent = data.motd;
     players.textContent = `Players: ${data.players}`;
     ping.textContent = `Ping: ${data.ping}ms`;
 
-    statusBox.textContent = "Online";
+    statusBox.textContent = `Online • Score ${data.score}`;
 
   } catch (e) {
-    statusBox.textContent = "Server error";
+    statusBox.textContent = "Network error";
   }
 }
 
 render();
+loadTrending();

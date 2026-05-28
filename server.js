@@ -4,23 +4,49 @@ import cors from "cors";
 const app = express();
 app.use(cors());
 
-// simple in-memory cache
+/* =========================
+   SIMPLE IN-MEMORY CACHE
+========================= */
 const cache = new Map();
 
 function getCache(ip) {
-  const data = cache.get(ip);
-  if (!data) return null;
-  if (Date.now() - data.time > 60000) {
+  const entry = cache.get(ip);
+  if (!entry) return null;
+
+  if (Date.now() - entry.time > 60000) {
     cache.delete(ip);
     return null;
   }
-  return data.value;
+
+  return entry.data;
 }
 
-function setCache(ip, value) {
-  cache.set(ip, { value, time: Date.now() });
+function setCache(ip, data) {
+  cache.set(ip, {
+    data,
+    time: Date.now()
+  });
 }
 
+/* =========================
+   SCORE SYSTEM (v6 CORE)
+========================= */
+function calculateScore(d) {
+  const players = d.players?.online || 0;
+  const max = d.players?.max || 1;
+
+  const activity = (players / max) * 100;
+
+  return Math.floor(
+    activity +
+    (d.online ? 50 : 0) +
+    Math.random() * 10
+  );
+}
+
+/* =========================
+   SERVER STATUS API
+========================= */
 app.get("/api/server", async (req, res) => {
   const ip = req.query.ip;
   if (!ip) return res.json({ online: false });
@@ -38,6 +64,7 @@ app.get("/api/server", async (req, res) => {
 
     const response = {
       online: true,
+
       motd: Array.isArray(d.motd?.clean)
         ? d.motd.clean.join(" ")
         : d.motd?.clean || "No MOTD",
@@ -46,11 +73,9 @@ app.get("/api/server", async (req, res) => {
 
       icon: d.icon || "",
 
-      ping: d.debug?.ping ?? Math.floor(Math.random() * 100),
+      ping: d.debug?.ping ?? Math.floor(Math.random() * 120),
 
-      score:
-        (d.players?.online ?? 0) +
-        Math.floor(Math.random() * 50)
+      score: calculateScore(d)
     };
 
     setCache(ip, response);
@@ -61,17 +86,57 @@ app.get("/api/server", async (req, res) => {
   }
 });
 
-// trending endpoint (NEW)
-app.get("/api/trending", (req, res) => {
-  res.json([
-    { ip: "hypixel.net", score: 999 },
-    { ip: "2b2t.org", score: 850 },
-    { ip: "mineplex.com", score: 700 },
-    { ip: "herobrine.org", score: 650 }
-  ]);
+/* =========================
+   TRENDING SYSTEM (v6)
+========================= */
+const trending = [
+  "hypixel.net",
+  "2b2t.org",
+  "mineplex.com",
+  "herobrine.org",
+  "pika-network.net"
+];
+
+app.get("/api/trending", async (req, res) => {
+  const results = [];
+
+  for (const ip of trending) {
+    try {
+      const r = await fetch(`https://api.mcsrvstat.us/2/${ip}`);
+      const d = await r.json();
+
+      if (d.online) {
+        results.push({
+          ip,
+          score: calculateScore(d),
+          players: d.players?.online || 0
+        });
+      }
+    } catch (e) {}
+  }
+
+  results.sort((a, b) => b.score - a.score);
+
+  res.json(results);
 });
 
+/* =========================
+   SEARCH API (v6)
+========================= */
+app.get("/api/search", async (req, res) => {
+  const q = (req.query.q || "").toLowerCase();
+
+  if (!q) return res.json([]);
+
+  const base = trending.filter(x => x.includes(q));
+
+  res.json(base);
+});
+
+/* =========================
+   START SERVER
+========================= */
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log("MinePulse v4 running on port " + PORT);
+  console.log("🚀 MinePulse v6 running on port " + PORT);
 });

@@ -1,197 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-
-    <meta name="viewport"
-    content="width=device-width, initial-scale=1.0">
-
-    <title>MinePulse</title>
-
-    <meta name="description"
-    content="MinePulse is a futuristic Minecraft server intelligence platform with real-time server analytics, status checking, favorites, and monitoring.">
-
-    <meta name="keywords"
-    content="minecraft server checker, minecraft status, minecraft analytics, minepulse, minecraft server finder">
-
-    <meta name="author"
-    content="KasishStar">
-
-    <meta property="og:title"
-    content="MinePulse">
-
-    <meta property="og:description"
-    content="Futuristic Minecraft Server Intelligence Platform">
-
-    <meta property="og:type"
-    content="website">
-
-    <meta property="og:url"
-    content="https://kasishstar.github.io/minepulse">
-
-    <meta property="og:image"
-    content="https://kasishstar.github.io/minepulse/banner.png">
-
-    <link rel="stylesheet"
-    href="style.css">
-
-    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
-
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-KS8QE5Y1PS"></script>
-
-    <script>
-      window.dataLayer = window.dataLayer || [];
-
-      function gtag() {
-        dataLayer.push(arguments);
-      }
-
-      gtag('js', new Date());
-
-      gtag('config', 'G-KS8QE5Y1PS');
-    </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MinePulse v2</title>
+  <link rel="stylesheet" href="style.css"/>
 </head>
-
 <body>
 
-    <div id="particles-js"></div>
+<div class="bg"></div>
 
-    <div class="container">
+<div class="app">
 
-        <h1>MinePulse</h1>
+  <h1>🟩 MinePulse v2</h1>
+  <p class="sub">Advanced Minecraft Server Explorer</p>
 
-        <p class="subtitle">
-            Minecraft Server Intelligence Platform
-        </p>
+  <!-- SEARCH -->
+  <div class="searchBox">
+    <input id="serverIP" placeholder="Search server (e.g. hypixel.net)" />
+    <button id="searchBtn">Search</button>
+    <button id="favBtn">★</button>
+  </div>
 
-        <div class="search-box">
+  <!-- STATUS -->
+  <div id="status" class="status"></div>
 
-            <input
-            type="text"
-            id="serverIP"
-            placeholder="Enter Minecraft Server IP">
+  <!-- AUTOCOMPLETE -->
+  <div id="suggestions" class="suggestions"></div>
 
-            <button onclick="checkServerStatus()">
-                Scan
-            </button>
-        </div>
+  <!-- SERVER CARD -->
+  <div id="card" class="card hidden">
+    <img id="icon" />
+    <div>
+      <h2 id="name"></h2>
+      <p id="motd"></p>
+      <p id="players"></p>
+      <p id="ping"></p>
+    </div>
+  </div>
 
-        <div class="actions">
+  <!-- PANELS -->
+  <div class="grid">
 
-            <button id="copyBtn">
-                Copy IP
-            </button>
-
-            <button id="favoriteBtn">
-                Favorite
-            </button>
-        </div>
-
-        <div class="server-card">
-
-            <img
-            id="serverIcon"
-            src="https://static-00.iconduck.com/assets.00/minecraft-icon-2048x2048-3i6m39mg.png">
-
-            <h2 id="status">
-                Waiting...
-            </h2>
-
-            <div class="info-grid">
-
-                <div class="info-box">
-                    <span>Players</span>
-                    <h3 id="players">-</h3>
-                </div>
-
-                <div class="info-box">
-                    <span>Version</span>
-                    <h3 id="version">-</h3>
-                </div>
-
-                <div class="info-box">
-                    <span>Ping</span>
-                    <h3 id="ping">-</h3>
-                </div>
-
-                <div class="info-box">
-                    <span>Software</span>
-                    <h3 id="software">-</h3>
-                </div>
-            </div>
-
-            <div class="motd-box">
-                <span>MOTD</span>
-                <p id="motd">-</p>
-            </div>
-        </div>
-
-        <div class="panel">
-
-            <h2>Favorites</h2>
-
-            <div id="favoritesList"></div>
-        </div>
-
-        <div class="panel">
-
-            <h2>Recent Searches</h2>
-
-            <div id="recentList"></div>
-        </div>
-
-        <div class="panel">
-
-            <h2>Trending Servers</h2>
-
-            <div id="trendingList"></div>
-        </div>
-
+    <div class="box">
+      <h3>⭐ Favorites</h3>
+      <ul id="favList"></ul>
     </div>
 
-    <script src="script.js"></script>
+    <div class="box">
+      <h3>🕘 History</h3>
+      <ul id="histList"></ul>
+    </div>
 
-    <script>
+    <div class="box">
+      <h3>🔥 Trending</h3>
+      <ul id="trendList"></ul>
+    </div>
 
-        particlesJS("particles-js", {
+  </div>
 
-            particles: {
+</div>
 
-                number: {
-                    value: 60
-                },
-
-                color: {
-                    value: "#00aaff"
-                },
-
-                shape: {
-                    type: "circle"
-                },
-
-                opacity: {
-                    value: 0.4
-                },
-
-                size: {
-                    value: 3
-                },
-
-                move: {
-                    enable: true,
-                    speed: 1
-                },
-
-                line_linked: {
-                    enable: true,
-                    color: "#00aaff",
-                    opacity: 0.2
-                }
-            }
-        });
-
-    </script>
-
+<script src="script.js"></script>
 </body>
 </html>

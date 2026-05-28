@@ -1,597 +1,186 @@
-const input =
-document.getElementById("serverIP");
+const input = document.getElementById("serverIP");
+const searchBtn = document.getElementById("searchBtn");
+const favBtn = document.getElementById("favBtn");
 
-const copyBtn =
-document.getElementById("copyBtn");
+const statusBox = document.getElementById("status");
 
-const favoriteBtn =
-document.getElementById("favoriteBtn");
+const card = document.getElementById("card");
+const icon = document.getElementById("icon");
+const nameEl = document.getElementById("name");
+const motd = document.getElementById("motd");
+const players = document.getElementById("players");
+const ping = document.getElementById("ping");
 
-const favoritesList =
-document.getElementById("favoritesList");
+const favList = document.getElementById("favList");
+const histList = document.getElementById("histList");
+const trendList = document.getElementById("trendList");
+const suggestions = document.getElementById("suggestions");
 
-const historyList =
-document.getElementById("historyList");
+let fav = JSON.parse(localStorage.getItem("fav")) || [];
+let hist = JSON.parse(localStorage.getItem("hist")) || [];
 
-const monitorGrid =
-document.getElementById("monitorGrid");
+/* TRENDING (B) */
+const trending = [
+  "hypixel.net",
+  "mineplex.com",
+  "herobrine.org",
+  "2b2t.org",
+  "pika-network.net"
+];
 
-let currentIP = "";
+/* SAVE */
+function save() {
+  localStorage.setItem("fav", JSON.stringify(fav));
+  localStorage.setItem("hist", JSON.stringify(hist));
+}
 
-let monitoredServers = [];
+/* RENDER LISTS */
+function render() {
+  favList.innerHTML = "";
+  histList.innerHTML = "";
+  trendList.innerHTML = "";
 
-loadFavorites();
-loadTrending();
-loadAnalytics();
-loadHistory();
+  fav.forEach(x => {
+    let li = document.createElement("li");
+    li.textContent = x;
+    li.onclick = () => input.value = x;
+    favList.appendChild(li);
+  });
 
-copyBtn.addEventListener("click", () => {
+  hist.forEach(x => {
+    let li = document.createElement("li");
+    li.textContent = x;
+    li.onclick = () => input.value = x;
+    histList.appendChild(li);
+  });
 
-    if (!currentIP) return;
+  trending.forEach(x => {
+    let li = document.createElement("li");
+    li.textContent = x;
+    li.onclick = () => input.value = x;
+    trendList.appendChild(li);
+  });
+}
 
-    navigator.clipboard.writeText(currentIP);
+/* AUTOCOMPLETE */
+input.addEventListener("input", () => {
+  const val = input.value.toLowerCase();
+  suggestions.innerHTML = "";
 
-    copyBtn.innerText = "Copied!";
+  if (!val) return;
 
-    setTimeout(() => {
-
-        copyBtn.innerText = "Copy IP";
-
-    }, 2000);
+  [...trending, ...fav]
+    .filter(x => x.includes(val))
+    .slice(0, 5)
+    .forEach(x => {
+      const div = document.createElement("div");
+      div.textContent = x;
+      div.onclick = () => {
+        input.value = x;
+        suggestions.innerHTML = "";
+      };
+      suggestions.appendChild(div);
+    });
 });
 
-favoriteBtn.addEventListener("click", () => {
+/* SEARCH */
+searchBtn.onclick = () => fetchServer(input.value);
 
-    if (!currentIP) return;
+/* FAVORITE */
+favBtn.onclick = () => {
+  if (!input.value) return;
+  if (!fav.includes(input.value)) fav.push(input.value);
+  save();
+  render();
+};
 
-    let favorites =
-    JSON.parse(
-        localStorage.getItem(
-        "favorites"
-        )
-    ) || [];
+/* ENTER */
+input.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    fetchServer(input.value);
+  }
+});
 
-    if (!favorites.includes(currentIP)) {
+/* BACKEND CALL (C) */
+async function fetchServer(ip) {
+  if (!ip) return;
 
-        favorites.push(currentIP);
+  statusBox.textContent = "Searching...";
 
-        localStorage.setItem(
-            "favorites",
-            JSON.stringify(favorites)
-        );
+  hist.unshift(ip);
+  hist = [...new Set(hist)].slice(0, 10);
+  save();
+  render();
 
-        loadFavorites();
-        loadAnalytics();
+  try {
+    const res = await fetch(`http://localhost:3000/api/server?ip=${ip}`);
+    const data = await res.json();
+
+    if (!data.online) {
+      statusBox.textContent = "Offline";
+      card.classList.add("hidden");
+      return;
     }
-});
 
-input.addEventListener("keypress", (e) => {
+    card.classList.remove("hidden");
 
-    if (e.key === "Enter") {
+    icon.src = data.icon;
+    nameEl.textContent = ip;
+    motd.textContent = data.motd;
+    players.textContent = `Players: ${data.players}`;
+    ping.textContent = `Latency: ${data.ping}ms`;
 
-        checkServerStatus();
-    }
-});
+    statusBox.textContent = "Online";
+
+  } catch (e) {
+    statusBox.textContent = "Server error";
+  }
+}
+
+render();
+const API_BASE = "http://localhost:3000"; 
+// 🔴 CHANGE THIS AFTER DEPLOY (I’ll show below)
+
+const input = document.getElementById("serverIP");
+const searchBtn = document.getElementById("searchBtn");
+
+const statusBox = document.getElementById("status");
+
+const card = document.getElementById("card");
+const icon = document.getElementById("icon");
+const nameEl = document.getElementById("name");
+const motd = document.getElementById("motd");
+const players = document.getElementById("players");
+const ping = document.getElementById("ping");
+
+searchBtn.onclick = () => fetchServer(input.value);
 
 async function fetchServer(ip) {
+  if (!ip) return;
 
-    try {
+  statusBox.textContent = "Searching...";
 
-        const response =
-        await fetch(
-        `https://api.mcsrvstat.us/2/${ip}`
-        );
+  try {
+    const res = await fetch(`${API_BASE}/api/server?ip=${ip}`);
+    const data = await res.json();
 
-        return await response.json();
-
-    } catch {
-
-        return {
-            online:false
-        };
-    }
-}
-
-async function checkServerStatus() {
-
-    const ip =
-    input.value.trim();
-
-    if (!ip) {
-
-        alert("Enter server IP");
-        return;
+    if (!data.online) {
+      statusBox.textContent = "Offline";
+      card.classList.add("hidden");
+      return;
     }
 
-    currentIP = ip;
+    card.classList.remove("hidden");
 
-    addHistory(ip);
+    icon.src = data.icon;
+    nameEl.textContent = ip;
+    motd.textContent = data.motd;
+    players.textContent = `Players: ${data.players}`;
+    ping.textContent = `Ping: ${data.ping}ms`;
 
-    const data =
-    await fetchServer(ip);
+    statusBox.textContent = "Online";
 
-    updateUI(data, ip);
-
-    addMonitorCard(data, ip);
-
-    updateAnalytics();
+  } catch (e) {
+    statusBox.textContent = "Server error";
+  }
 }
-
-function detectSoftware(version) {
-
-    if (!version) {
-
-        return "Unknown";
-    }
-
-    const lower =
-    version.toLowerCase();
-
-    if (lower.includes("paper")) {
-
-        return "Paper";
-    }
-
-    if (lower.includes("spigot")) {
-
-        return "Spigot";
-    }
-
-    if (lower.includes("forge")) {
-
-        return "Forge";
-    }
-
-    if (lower.includes("fabric")) {
-
-        return "Fabric";
-    }
-
-    if (lower.includes("purpur")) {
-
-        return "Purpur";
-    }
-
-    return "Vanilla";
-}
-
-function addMonitorCard(data, ip) {
-
-    if (monitoredServers.includes(ip)) {
-
-        return;
-    }
-
-    monitoredServers.push(ip);
-
-    const div =
-    document.createElement("div");
-
-    div.className =
-    data.online
-    ? "monitor-card online-card"
-    : "monitor-card offline-card";
-
-    div.innerHTML = `
-
-    <button class="remove-btn">
-    ✖
-    </button>
-
-    <h3>${ip}</h3>
-
-    <p>
-    ${data.online
-    ? "🟢 Online"
-    : "🔴 Offline"}
-    </p>
-
-    <p>
-    ${data.version || "-"}
-    </p>
-
-    `;
-
-    div.querySelector(".remove-btn")
-    .onclick = () => {
-
-        div.remove();
-
-        monitoredServers =
-        monitoredServers.filter(
-        server => server !== ip
-        );
-    };
-
-    monitorGrid.appendChild(div);
-}
-
-function addHistory(ip) {
-
-    let history =
-    JSON.parse(
-        localStorage.getItem(
-        "history"
-        )
-    ) || [];
-
-    history.unshift(ip);
-
-    history =
-    [...new Set(history)];
-
-    history =
-    history.slice(0, 8);
-
-    localStorage.setItem(
-        "history",
-        JSON.stringify(history)
-    );
-
-    loadHistory();
-}
-
-function loadHistory() {
-
-    historyList.innerHTML = "";
-
-    const history =
-    JSON.parse(
-        localStorage.getItem(
-        "history"
-        )
-    ) || [];
-
-    history.forEach(ip => {
-
-        const div =
-        document.createElement("div");
-
-        div.className =
-        "list-item";
-
-        div.innerText = ip;
-
-        div.onclick = () => {
-
-            input.value = ip;
-
-            checkServerStatus();
-        };
-
-        historyList.appendChild(div);
-    });
-}
-
-function updateUI(data, ip) {
-
-    const status =
-    document.getElementById("status");
-
-    if (data.online) {
-
-        status.innerText =
-        "🟢 Online";
-
-        status.className =
-        "online";
-
-        document.getElementById(
-        "players"
-        ).innerText =
-
-        data.players
-
-        ? `${data.players.online}/${data.players.max}`
-
-        : "-";
-
-        document.getElementById(
-        "version"
-        ).innerText =
-        data.version || "-";
-
-        const pingValue =
-
-        Math.floor(
-        Math.random() * 120
-        ) + 20;
-
-        document.getElementById(
-        "ping"
-        ).innerText =
-        `${pingValue} ms`;
-
-        document.getElementById(
-        "pingStatus"
-        ).innerText =
-        "Stable";
-
-        document.getElementById(
-        "softwareType"
-        ).innerText =
-        detectSoftware(
-        data.version
-        );
-
-        document.getElementById(
-        "motd"
-        ).innerText =
-
-        data.motd &&
-        data.motd.clean
-
-        ? data.motd.clean.join(" ")
-
-        : "-";
-
-        document.getElementById(
-        "bedrock"
-        ).innerText =
-
-        data.bedrock
-        ? "Supported"
-        : "Java Only";
-
-        incrementUptime(ip);
-
-        document.getElementById(
-        "uptimeMemory"
-        ).innerText =
-
-        `${getUptime(ip)} checks`;
-
-        if (data.icon) {
-
-            document.getElementById(
-            "serverIcon"
-            ).src =
-            data.icon;
-        }
-
-    } else {
-
-        status.innerText =
-        "🔴 Offline";
-
-        status.className =
-        "offline";
-
-        document.getElementById(
-        "players"
-        ).innerText = "-";
-
-        document.getElementById(
-        "version"
-        ).innerText = "-";
-
-        document.getElementById(
-        "ping"
-        ).innerText = "-";
-
-        document.getElementById(
-        "motd"
-        ).innerText = "-";
-
-        document.getElementById(
-        "bedrock"
-        ).innerText = "-";
-
-        document.getElementById(
-        "softwareType"
-        ).innerText = "-";
-    }
-}
-
-function incrementUptime(ip) {
-
-    let uptime =
-    JSON.parse(
-        localStorage.getItem(
-        "uptime"
-        )
-    ) || {};
-
-    uptime[ip] =
-    (uptime[ip] || 0) + 1;
-
-    localStorage.setItem(
-        "uptime",
-        JSON.stringify(uptime)
-    );
-}
-
-function getUptime(ip) {
-
-    let uptime =
-    JSON.parse(
-        localStorage.getItem(
-        "uptime"
-        )
-    ) || {};
-
-    return uptime[ip] || 0;
-}
-
-function updateAnalytics() {
-
-    let checks =
-    Number(
-        localStorage.getItem(
-        "checks"
-        )
-    ) || 0;
-
-    checks++;
-
-    localStorage.setItem(
-        "checks",
-        checks
-    );
-
-    loadAnalytics();
-}
-
-function loadAnalytics() {
-
-    document.getElementById(
-    "totalChecks"
-    ).innerText =
-
-    localStorage.getItem(
-    "checks"
-    ) || 0;
-
-    const favorites =
-    JSON.parse(
-        localStorage.getItem(
-        "favorites"
-        )
-    ) || [];
-
-    document.getElementById(
-    "favoriteCount"
-    ).innerText =
-    favorites.length;
-}
-
-function loadFavorites() {
-
-    favoritesList.innerHTML = "";
-
-    const favorites =
-    JSON.parse(
-        localStorage.getItem(
-        "favorites"
-        )
-    ) || [];
-
-    favorites.forEach(ip => {
-
-        const div =
-        document.createElement("div");
-
-        div.className =
-        "list-item";
-
-        div.innerText = ip;
-
-        div.onclick = () => {
-
-            input.value = ip;
-
-            checkServerStatus();
-        };
-
-        favoritesList.appendChild(div);
-    });
-}
-
-function loadTrending() {
-
-    const trendingList =
-    document.getElementById(
-        "trendingList"
-    );
-
-    trendingList.innerHTML = "";
-
-    const trendingServers = [
-
-        "hypixel.net",
-        "play.cubecraft.net",
-        "play.jartexnetwork.com",
-        "play.pika-network.net",
-        "mc.hivebedrock.network"
-
-    ];
-
-    trendingServers.forEach(ip => {
-
-        const div =
-        document.createElement("div");
-
-        div.className =
-        "list-item";
-
-        div.innerText = ip;
-
-        div.onclick = () => {
-
-            input.value = ip;
-
-            checkServerStatus();
-        };
-
-        trendingList.appendChild(div);
-    });
-}
-
-particlesJS("particles-js", {
-
-    particles: {
-
-        number: {
-            value: 70
-        },
-
-        color: {
-            value: "#60a5fa"
-        },
-
-        shape: {
-            type: "circle"
-        },
-
-        opacity: {
-            value: 0.4
-        },
-
-        size: {
-            value: 3
-        },
-
-        line_linked: {
-
-            enable:true,
-
-            distance:150,
-
-            color:"#2563eb",
-
-            opacity:0.3,
-
-            width:1
-        },
-
-        move:{
-
-            enable:true,
-
-            speed:1.5
-        }
-    }
-});
-
-const cursorGlow =
-document.querySelector(".cursor-glow");
-
-document.addEventListener(
-"mousemove",
-(e) => {
-
-    cursorGlow.style.left =
-    `${e.clientX}px`;
-
-    cursorGlow.style.top =
-    `${e.clientY}px`;
-});
-
-setInterval(() => {
-
-    if (currentIP) {
-
-        checkServerStatus();
-    }
-
-}, 30000);

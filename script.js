@@ -23,55 +23,60 @@ const copyBtn = document.getElementById("copyBtn");
 let fav = JSON.parse(localStorage.getItem("fav")) || [];
 let hist = JSON.parse(localStorage.getItem("hist")) || [];
 
-/* TOAST SYSTEM (NEW v8) */
-function toast(msg) {
-  let t = document.createElement("div");
-  t.className = "toast";
+/* =========================
+   TOAST SYSTEM (v9 CORE)
+========================= */
+function toast(msg, type = "info") {
+  const t = document.createElement("div");
+  t.className = `toast ${type}`;
   t.textContent = msg;
 
   document.body.appendChild(t);
 
-  setTimeout(() => {
-    t.classList.add("show");
-  }, 10);
+  requestAnimationFrame(() => t.classList.add("show"));
 
   setTimeout(() => {
     t.classList.remove("show");
     setTimeout(() => t.remove(), 300);
-  }, 2000);
+  }, 1800);
 }
 
-/* SAVE */
+/* =========================
+   SAVE STATE
+========================= */
 function save() {
   localStorage.setItem("fav", JSON.stringify(fav));
   localStorage.setItem("hist", JSON.stringify(hist));
 }
 
-/* RENDER */
+/* =========================
+   RENDER LISTS (optimized)
+========================= */
+function renderList(el, arr) {
+  el.innerHTML = "";
+
+  arr.slice(0, 10).forEach(value => {
+    const li = document.createElement("li");
+    li.textContent = value;
+
+    li.onclick = () => {
+      input.value = value;
+      fetchServer(value);
+    };
+
+    el.appendChild(li);
+  });
+}
+
 function render() {
-  favList.innerHTML = "";
-  histList.innerHTML = "";
-  trendList.innerHTML = "";
-
-  fav.forEach(x => addItem(favList, x));
-  hist.forEach(x => addItem(histList, x));
-
+  renderList(favList, fav);
+  renderList(histList, hist);
   loadTrending();
 }
 
-function addItem(parent, value) {
-  const li = document.createElement("li");
-  li.textContent = value;
-
-  li.onclick = () => {
-    input.value = value;
-    fetchServer(value);
-  };
-
-  parent.appendChild(li);
-}
-
-/* TRENDING */
+/* =========================
+   TRENDING
+========================= */
 async function loadTrending() {
   try {
     const res = await fetch(`${API_BASE}/api/trending`);
@@ -90,37 +95,78 @@ async function loadTrending() {
 
       trendList.appendChild(li);
     });
-  } catch (e) {}
+  } catch {
+    /* silent fail */
+  }
 }
 
-/* FAVORITE */
+/* =========================
+   FAVORITE
+========================= */
 favBtn.onclick = () => {
   if (!input.value) return;
-  if (!fav.includes(input.value)) fav.push(input.value);
-  save();
-  render();
-  toast("Added to favorites ⭐");
+
+  if (!fav.includes(input.value)) {
+    fav.push(input.value);
+    save();
+    render();
+    toast("Added to favorites ⭐", "success");
+  }
 };
 
-/* SEARCH */
+/* =========================
+   SEARCH
+========================= */
 searchBtn.onclick = () => fetchServer(input.value);
 
 input.addEventListener("keydown", e => {
   if (e.key === "Enter") fetchServer(input.value);
 });
 
-/* COPY IP (v8 upgraded) */
+/* =========================
+   COPY SYSTEM (v9 upgraded)
+========================= */
+function copyToClipboard(text) {
+  if (!text) return false;
+
+  try {
+    navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    /* fallback */
+    const temp = document.createElement("textarea");
+    temp.value = text;
+    document.body.appendChild(temp);
+    temp.select();
+    document.execCommand("copy");
+    temp.remove();
+    return true;
+  }
+}
+
 copyBtn?.addEventListener("click", () => {
-  if (!nameEl.textContent) return;
+  const ip = nameEl.textContent;
 
-  navigator.clipboard.writeText(nameEl.textContent);
+  if (!ip) return;
 
-  toast(`Copied: ${nameEl.textContent} 📋`);
+  const ok = copyToClipboard(ip);
+
+  if (ok) {
+    toast(`Copied: ${ip} 📋`, "success");
+  } else {
+    toast("Copy failed ❌", "error");
+  }
 });
 
-/* MAIN FETCH */
+/* =========================
+   MAIN FETCH (v9 stabilized)
+========================= */
+let lastIP = null;
+
 async function fetchServer(ip) {
-  if (!ip) return;
+  if (!ip || ip === lastIP) return;
+
+  lastIP = ip;
 
   statusBox.textContent = "Scanning...";
   card.classList.add("hidden");
@@ -136,12 +182,12 @@ async function fetchServer(ip) {
 
     if (!data.online) {
       statusBox.textContent = "Offline / Not Found";
-      toast("Server offline ❌");
+      toast("Server offline ❌", "error");
       return;
     }
 
     card.classList.remove("hidden");
-    card.classList.add("show"); // animation hook
+    card.classList.add("show");
 
     icon.src = data.icon || "";
     nameEl.textContent = ip;
@@ -152,13 +198,14 @@ async function fetchServer(ip) {
 
     statusBox.textContent = `Online • Score ${data.score}`;
 
-    toast("Server loaded ⚡");
+    toast("Server loaded ⚡", "success");
 
-  } catch (e) {
+  } catch {
     statusBox.textContent = "Network error";
-    toast("Connection failed ❌");
+    toast("Network failed ❌", "error");
   }
 }
 
+/* INIT */
 render();
 loadTrending();

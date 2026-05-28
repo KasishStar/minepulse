@@ -171,3 +171,39 @@ ul {
     opacity: 1;
   }
 }
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(25,25,25,0.95);
+  color: white;
+  font-size: 14px;
+  opacity: 0;
+  transition: 0.25s ease;
+  z-index: 9999;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.toast.success {
+  border: 1px solid #2ecc71;
+}
+
+.toast.error {
+  border: 1px solid #e74c3c;
+}
+
+#card.show {
+  animation: pop 0.2s ease-out;
+}
+
+@keyframes pop {
+  from { transform: scale(0.97); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}

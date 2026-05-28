@@ -17,6 +17,18 @@ const ping = document.getElementById("ping");
 const favList = document.getElementById("favList");
 const histList = document.getElementById("histList");
 const trendList = document.getElementById("trendList");
+const copyBtn = document.getElementById("copyBtn");
+copyBtn.onclick = () => {
+  if (!nameEl.textContent) return;
+
+  navigator.clipboard.writeText(nameEl.textContent);
+
+  statusBox.textContent = "IP Copied 📋";
+
+  setTimeout(() => {
+    statusBox.textContent = "Online";
+  }, 1200);
+};
 
 /* STATE */
 let fav = JSON.parse(localStorage.getItem("fav")) || [];
@@ -28,7 +40,7 @@ function save() {
   localStorage.setItem("hist", JSON.stringify(hist));
 }
 
-/* RENDER LIST */
+/* RENDER LISTS */
 function render() {
   favList.innerHTML = "";
   histList.innerHTML = "";
@@ -52,7 +64,7 @@ function addItem(parent, value) {
   parent.appendChild(li);
 }
 
-/* TRENDING LOAD */
+/* TRENDING */
 async function loadTrending() {
   try {
     const res = await fetch(`${API_BASE}/api/trending`);
@@ -62,7 +74,7 @@ async function loadTrending() {
 
     data.forEach(item => {
       const li = document.createElement("li");
-      li.textContent = `${item.ip} (${item.score})`;
+      li.textContent = `${item.ip} • ${item.score}`;
 
       li.onclick = () => {
         input.value = item.ip;
@@ -77,12 +89,9 @@ async function loadTrending() {
 /* FAVORITE */
 favBtn.onclick = () => {
   if (!input.value) return;
-
-  if (!fav.includes(input.value)) {
-    fav.push(input.value);
-    save();
-    render();
-  }
+  if (!fav.includes(input.value)) fav.push(input.value);
+  save();
+  render();
 };
 
 /* SEARCH */
@@ -92,11 +101,20 @@ input.addEventListener("keydown", e => {
   if (e.key === "Enter") fetchServer(input.value);
 });
 
-/* CORE FETCH */
+/* COPY IP BUTTON (NEW v7 FEATURE) */
+function copyIP(ip) {
+  navigator.clipboard.writeText(ip);
+  statusBox.textContent = "IP Copied 📋";
+  setTimeout(() => {
+    statusBox.textContent = "Online";
+  }, 1200);
+}
+
+/* MAIN FETCH */
 async function fetchServer(ip) {
   if (!ip) return;
 
-  statusBox.textContent = "Scanning network...";
+  statusBox.textContent = "Scanning...";
   card.classList.add("hidden");
 
   hist.unshift(ip);
@@ -109,7 +127,7 @@ async function fetchServer(ip) {
     const data = await res.json();
 
     if (!data.online) {
-      statusBox.textContent = "Offline / Unknown";
+      statusBox.textContent = "Offline / Not Found";
       return;
     }
 
@@ -117,11 +135,17 @@ async function fetchServer(ip) {
 
     icon.src = data.icon || "";
     nameEl.textContent = ip;
+
+    /* MOTD */
     motd.textContent = data.motd;
+
     players.textContent = `Players: ${data.players}`;
     ping.textContent = `Ping: ${data.ping}ms`;
 
     statusBox.textContent = `Online • Score ${data.score}`;
+
+    /* attach copy feature dynamically */
+    nameEl.onclick = () => copyIP(ip);
 
   } catch (e) {
     statusBox.textContent = "Network error";

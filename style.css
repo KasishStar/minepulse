@@ -113,3 +113,27 @@ ul {
 .hidden {
   display: none;
 }
+.copy-btn {
+  margin-top: 10px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  background: #2b6fff;
+  color: white;
+  font-weight: bold;
+  transition: 0.2s;
+}
+
+.copy-btn:hover {
+  background: #1f4fcc;
+  transform: scale(1.05);
+}
+
+#card {
+  transition: 0.3s ease;
+  padding: 16px;
+  border-radius: 14px;
+  background: rgba(20,20,20,0.6);
+  backdrop-filter: blur(10px);
+}
